@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Team, type: :model do
   describe 'validations' do
     it { should validate_presence_of(:title)}
-    it { should validate_presence_of(:country)}
+    # it { should validate_presence_of(:country)}
 
     describe 'uniqueness of title' do
       let (:existing_team) { FactoryBot.create(:team, title: "#{Array.new(10) { ('a'..'z').to_a[rand(1..26)]}.join}" ) }
@@ -18,7 +18,7 @@ RSpec.describe Team, type: :model do
     end
 
     describe 'associations' do
-      it { should belong_to(:country) }
+      # it { should belong_to(:country) }
       it { should have_many(:team_aliases) }
     end
   end  
