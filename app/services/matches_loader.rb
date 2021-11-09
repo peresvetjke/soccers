@@ -26,8 +26,9 @@ class MatchesLoader
 
   def scrape_match_schedules
     # urls = scrape_months_urls
-    epl_url = MATCH_SCHEDULE_URLS[:EPL]
-    doc = Nokogiri::HTML(URI.open(epl_url))
+    
+    #epl_url = MATCH_SCHEDULE_URLS[:EPL]
+    #doc = Nokogiri::HTML(URI.open(epl_url))
 
     # for each month ..
     match_infos = []
