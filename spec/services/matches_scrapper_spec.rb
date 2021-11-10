@@ -1,5 +1,10 @@
 require 'rails_helper'
 
+=begin
+- перевести методы в модель
+- добавить тесты на ключевые методы сервиса
+=end
+
 RSpec.describe MatchesScrapper do
   describe "#teams" do
     before(:each) do

@@ -22,20 +22,20 @@ class MatchesScrapper
 
     parsed = parse_scrapped(html_doc)
     count[:all] = parsed.count
-    parsed.each do |record|
+    parsed.each do |record_args|
       begin
-        if record_exists?(record)
-          if record_needs_update?(record) 
-            binding.pry
-            update_record(record)
+        if record_exists?(record_args)
+          if record_needs_update?(record_args) 
+
+            update_record(record_args)
           else
             count[:not_changed] += 1
           end
         else
-          create_record(record)
+          create_record(record_args)
         end
       rescue StandardError => e
-        logger.info "An error of type #{e.class} happened, message is #{e.message}\n\n"
+        logger.info "An error of type #{e.class} happened, message is #{e.message}\nargs:#{record_args}\nBACKTRACE: #{e.backtrace.join} \n"
         count[:errors] += 1
       end
     end
@@ -100,12 +100,12 @@ class MatchesScrapper
   end
 
   def update_record(args)
-    Match.update(args)
+    record(record).update(args)
     count[:updated] += 1
   end
 
   def record_needs_update?(args)
-    record_exists?(args) && keys_to_update.all? {|k| record(args).send("#{k}").nil?} #&& args[k].present? } # record(args).select {|k,v| keys_to_update.include?(k)}.all? {|k,v| v.nil?}
+    record_exists?(args) && keys_to_update.all? {|k| record(args).send("#{k}").nil? && args[k].present? }
   end
 
   def record_exists?(args)    
@@ -123,9 +123,5 @@ class MatchesScrapper
 
   def keys_to_update
     [:score_home, :score_away]
-  end
-
-  def dates_match?(date1, date2)
-    date1.strftime("%Y-%m-%d %H:%M") == date2.strftime("%Y-%m-%d %H:%M")
   end
 end
