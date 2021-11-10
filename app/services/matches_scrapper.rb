@@ -10,13 +10,16 @@ class MatchesScrapper
   attr_reader   :logger, :html_doc
   attr_accessor :count
 
-  def initialize(web_page_scrapper)
+  def initialize(args = {})
+    web_page_scrapper = args[:web_pages_scrapper] || defaults[:web_pages_scrapper]
+
     @html_doc = web_page_scrapper.call
     @logger ||= Logger.new("#{Rails.root}/log/matches_scraper.log")
-    @count = {all: 0, created: 0, updated: 0, errors: 0, new_teams: []}
   end
 
   def call
+    @count = {all: 0, created: 0, updated: 0, errors: 0, new_teams: []}
+
     parsed = parse_scrapped(html_doc)
     count[:all] = parsed.count
     parsed.each do |record|
@@ -34,12 +37,23 @@ class MatchesScrapper
         count[:errors] += 1
       end
     end
+
     logger.info "\n-------------------------------------------------------
-    SCRAPPING COMPLETED. IN: #{count[:all]}, NEW RECORDS: #{count[:created]}, UPDATED: #{count[:updated]}, ERRORS: #{count[:errors]}\n
+    MATCHES_IN: #{count[:all]}, 
+    
+    SCRAPPING COMPLETED:
+    created - #{count[:created]}, 
+    updated - #{count[:updated]}, 
+    errors  - #{count[:errors]}
+    
     NEW TEAMS: #{count[:new_teams].flatten} Total: #{count[:new_teams].count}"
   end
 
   private
+
+  def defaults
+    { web_pages_scrapper: WebPagesScrapper.new }
+  end
 
   def parse_scrapped(html_doc)
     parsed_records = []
@@ -70,7 +84,7 @@ class MatchesScrapper
   def find_or_create_team(args)
     team = Team.find_by(args)
     if team
-      home_team = team
+      team
     else
       count[:new_teams] << args.values
       team = Team.create!(args)
@@ -85,13 +99,28 @@ class MatchesScrapper
     Match.update(args)
   end
 
-  def record_exists?(args)
-    args = args.except(:score_home, :score_away) # if args.key?(:score_home) || args.key?(:score_away)
-    Match.where(args).present?
-  end
-
   def record_needs_update?(args)
-    record_exists?(args) && args[:score_home].present? && args[:score_away].present?
+    record_exists?(args) && keys_to_update.all? {|k| record(args).send("#{k}").nil? } # record(args).select {|k,v| keys_to_update.include?(k)}.all? {|k,v| v.nil?}
   end
 
+  def record_exists?(args)    
+    record(args).present?
+  end
+
+  def record(args)
+    keys = args.select {|k,v| keys_find_by.include?(k)} # if args.key?(:score_home) || args.key?(:score_away)
+    Match.where(keys).first
+  end
+
+  def keys_find_by
+    [:home_team, :away_team, :date_time]
+  end
+
+  def keys_to_update
+    [:score_home, :score_away]
+  end
+
+  def dates_match?(date1, date2)
+    date1.strftime("%Y-%m-%d %H:%M") == date2.strftime("%Y-%m-%d %H:%M")
+  end
 end

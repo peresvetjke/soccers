@@ -10,17 +10,16 @@ class WebPagesScrapper
                           La_liga:  "https://www.sports.ru/la-liga/calendar/"
                         }
   
-  attr_reader :file, :url, :logger
+  attr_reader :html_file_path, :url
 
-  def initialize(args)
-    @file = args[:file]
+  def initialize(args = {})
+    @html_file_path = args[:html_file_path]
     @url = args[:url]  || defaults[:url]
-    @logger ||= Logger.new("#{Rails.root}/log/matches_scraper.log")
   end
 
   def call
-    if @file.present?
-      scrap_file(@file)
+    if @html_file_path.present?
+      scrap_file(@html_file_path)
     else
       scrap_web_page(@url)
     end
@@ -34,12 +33,11 @@ class WebPagesScrapper
     }
   end
 
-  def scrap_file(file)
-    Nokogiri::HTML(file)
+  def scrap_file(html_file_path)
+    Nokogiri::HTML(File.read(html_file_path))
   end
 
   def scrap_web_page(url)
     Nokogiri::HTML(URI.open(url))
   end
-
 end
