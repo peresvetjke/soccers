@@ -18,19 +18,21 @@ class MatchesScrapper
   end
 
   def call
-    @count = {all: 0, created: 0, updated: 0, errors: 0, new_teams: []}
+    @count = {all: 0, created: 0, updated: 0, not_changed: 0, errors: 0, new_teams: []}
 
     parsed = parse_scrapped(html_doc)
     count[:all] = parsed.count
     parsed.each do |record|
       begin
         if record_exists?(record)
-          if record_needs_update?(record)
-            count[:updated] += 1 if update_record(record)
+          if record_needs_update?(record) 
+            binding.pry
+            update_record(record)
+          else
+            count[:not_changed] += 1
           end
         else
           create_record(record)
-          count[:created] += 1
         end
       rescue StandardError => e
         logger.info "An error of type #{e.class} happened, message is #{e.message}\n\n"
@@ -42,9 +44,10 @@ class MatchesScrapper
     MATCHES_IN: #{count[:all]}, 
     
     SCRAPPING COMPLETED:
-    created - #{count[:created]}, 
-    updated - #{count[:updated]}, 
-    errors  - #{count[:errors]}
+    created     - #{count[:created]}, 
+    updated     - #{count[:updated]}, 
+    not_changed - #{count[:not_changed]}, 
+    errors      - #{count[:errors]}
     
     NEW TEAMS: #{count[:new_teams].flatten} Total: #{count[:new_teams].count}"
   end
@@ -83,7 +86,7 @@ class MatchesScrapper
 
   def find_or_create_team(args)
     team = Team.find_by(args)
-    if team
+    if team# .present?
       team
     else
       count[:new_teams] << args.values
@@ -93,14 +96,16 @@ class MatchesScrapper
 
   def create_record(args)
     Match.create!(args)
+    count[:created] += 1
   end
 
   def update_record(args)
     Match.update(args)
+    count[:updated] += 1
   end
 
   def record_needs_update?(args)
-    record_exists?(args) && keys_to_update.all? {|k| record(args).send("#{k}").nil? } # record(args).select {|k,v| keys_to_update.include?(k)}.all? {|k,v| v.nil?}
+    record_exists?(args) && keys_to_update.all? {|k| record(args).send("#{k}").nil?} #&& args[k].present? } # record(args).select {|k,v| keys_to_update.include?(k)}.all? {|k,v| v.nil?}
   end
 
   def record_exists?(args)    

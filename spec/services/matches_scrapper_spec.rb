@@ -15,10 +15,11 @@ RSpec.describe MatchesScrapper do
     end
 
     context "when team exists" do
-      let! (:team_one) { create(:team, title: "Вольфсбург") }
-      let! (:team_two) { create(:team, title: "Ред Булл") }
+      #let! (:team_one) { create(:team, title: "Вольфсбург") }
+      #let! (:team_two) { create(:team, title: "Ред Булл") }
 
       it "doesn't create a new team in db" do
+        binding.pry
         expect { @ms.call }.not_to change(Team, :count)
       end
     end    
@@ -44,9 +45,9 @@ RSpec.describe MatchesScrapper do
         @ms = MatchesScrapper.new(web_pages_scrapper: @wps)
       end
 
-      let! (:team_one) { create(:team, title: "Вольфсбург") }
-      let! (:team_two) { create(:team, title: "Ред Булл") }
-      let! (:match_one) { create(:match, home_team_id: team_one.id, away_team_id: team_two.id, date_time: Time.new(2021,11,05,17,00)) }
+      #let! (:team_one) { create(:team, title: "Вольфсбург") }
+      #let! (:team_two) { create(:team, title: "Ред Булл") }
+      # let! (:match_one) { create(:match, home_team_id: team_one.id, away_team_id: team_two.id, date_time: Time.new(2021,11,05,17,00)) }
 
       it "doesn't create record" do
         expect { @ms.call }.not_to change(Match, :count)
@@ -54,19 +55,24 @@ RSpec.describe MatchesScrapper do
 
       context "when score is blank on site" do
         before(:context) do
+          @team_one = create(:team, title: "Вольфсбург") 
+          @team_two = create(:team, title: "Ред Булл") 
           @html_file_path = "/home/i/workspace/repo/soccers/spec/services/html_test_cases/2_sports_ru_matches_test_html_without_score"
           @wps = WebPagesScrapper.new(html_file_path: @html_file_path)
           @ms = MatchesScrapper.new(web_pages_scrapper: @wps)
+          @match_one = create(:match, home_team_id: @team_one.id, away_team_id: @team_two.id, date_time: Time.new(2021,11,05,17,00))
+          @updated_at_before = @match_one.updated_at
         end
 
         it "doesn't update record" do
-          expect { @ms.call }.not_to change(match_one, :updated_at)
+          @ms.call 
+          expect(match_one.reload.updated_at).to eq(@updated_at_before)
         end
       end
 
       context "when score is filled on site" do
-          let! (:team_one) { create(:team, title: "Вольфсбург") }
-          let! (:team_two) { create(:team, title: "Ред Булл") }
+          #let! (:team_one) { create(:team, title: "Вольфсбург") }
+          #let! (:team_two) { create(:team, title: "Ред Булл") }
 
         before(:context) do
           @html_file_path = "/home/i/workspace/repo/soccers/spec/services/html_test_cases/1_sports_ru_matches_test_html_with_score"
@@ -76,9 +82,11 @@ RSpec.describe MatchesScrapper do
 
         context "when score saved already in db" do
           let! (:match_one) { create(:match, home_team_id: team_one.id, away_team_id: team_two.id, date_time: Time.new(2021,11,05,17,00), score_home: 2, score_away: 1) }
-
+          let! (:updated_at_before) { match_one.updated_at }
           it "doesn't update record" do
-            expect { @ms.call }.not_to change(match_one, :updated_at)
+            
+            @ms.call 
+            expect(match_one.reload.updated_at).to eq(match_one.updated_at)
           end
         end
 
