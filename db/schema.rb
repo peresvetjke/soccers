@@ -31,15 +31,13 @@ ActiveRecord::Schema.define(version: 2021_11_12_141842) do
   end
 
   create_table "matches", force: :cascade do |t|
-    t.bigint "home_team_id", null: false
-    t.bigint "away_team_id", null: false
+    t.integer "home_team_id", null: false
+    t.integer "away_team_id", null: false
     t.datetime "date_time", null: false
     t.integer "score_home"
     t.integer "score_away"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["away_team_id"], name: "index_matches_on_away_team_id"
-    t.index ["home_team_id"], name: "index_matches_on_home_team_id"
   end
 
   create_table "team_aliases", force: :cascade do |t|
@@ -61,8 +59,6 @@ ActiveRecord::Schema.define(version: 2021_11_12_141842) do
   end
 
   add_foreign_key "leagues", "countries"
-  add_foreign_key "matches", "teams", column: "away_team_id"
-  add_foreign_key "matches", "teams", column: "home_team_id"
   add_foreign_key "team_aliases", "teams"
   add_foreign_key "teams", "countries"
 end

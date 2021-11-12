@@ -24,7 +24,6 @@ RSpec.describe MatchesScrapper do
       #let! (:team_two) { create(:team, title: "Ред Булл") }
 
       it "doesn't create a new team in db" do
-        binding.pry
         expect { @ms.call }.not_to change(Team, :count)
       end
     end    

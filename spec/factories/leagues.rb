@@ -1,9 +1,6 @@
 FactoryBot.define do
-  sequence :title do |n|
-    "title #{n}"
-  end
-
   factory :league do
     title
+    association :country, factory: :country
   end
 end
