@@ -3,8 +3,13 @@ FactoryBot.define do
     home_team { create(:team) }
     away_team { create(:team) }
     date_time { Time.new(2021,11,01,17,00) }
-    score_home { 2 }
+    score_home { 1 }
     score_away { 1 }
+
+    trait "with_score" do
+      score_home { 2 }
+      score_away { 2 }      
+    end
 
     trait "no_score" do
       score_home { nil }

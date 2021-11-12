@@ -9,13 +9,9 @@ class Match < ApplicationRecord
   end
 
   def self.accept!(args)
-    # checks if match exists
-    match_record = self.find_by(home_team_id: args[:home_team], away_team_id: args[:away_team], date_time: args[:date_time])
-    self.create!(args) unless match_record.present?
+    match_record = self.find_by(home_team_id: args[:home_team_id], away_team_id: args[:away_team_id], date_time: args[:date_time]) || self.create!(args)
+    if match_record.score_home != args[:score_home] || match_record.score_away != args[:score_away]
+      match_record.update(score_home: args[:score_home], score_away: args[:score_away])
+    end
   end
-
-  #def self.find_by(args)
-  #  keys = args.select {|k,v| keys_find_by.include?(k)} # if args.key?(:score_home) || args.key?(:score_away)
-  #  Match.where(keys).first
-  #end
 end
