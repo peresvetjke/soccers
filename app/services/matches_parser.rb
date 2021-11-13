@@ -4,15 +4,15 @@ require 'pry'
 
 class MatchesParser
 
-  SPORTS_RU_DATE_PATTERN  = /(?<day>\d{2})\.(?<month>\d{2})\.(?<year>\d{4})\|(?<hour>\d{2})\:(?<min>\d{2})/
-  SPORTS_RU_SCORE_PATTERN = /(?<home_score>\d+)\s*\:\s*(?<away_score>\d+)/
+  attr_reader   :match_infos
+  attr_accessor :result
 
-  def initialize
+  def initialize(match_infos)
+    @match_infos = match_infos
+    @result = { created_teams: [], created_matches: [], updated_matches: [] }
   end
 
-  def call(match_infos)
-    result = { created_teams: [], created_matches: [], updated_matches: [] }
-
+  def call
     match_infos.each do |match_info|
       date_time  = match_info[:date_time] 
       home_team  = Team.find_or_initialize_by(title: match_info[:home_team])
@@ -28,9 +28,15 @@ class MatchesParser
       end
 
       match = Match.find_or_initialize_by(home_team_id: home_team.id, away_team_id: away_team.id, date_time: date_time)
+      match.assign_attributes(score_home: score_home, score_away: score_away)
       if match.new_record?
         match.save!
         result[:created_matches] << match.id
+      else
+        if match.changed?
+          match.save!
+          result[:updated_matches] << match.id
+        end
       end
     end
     result

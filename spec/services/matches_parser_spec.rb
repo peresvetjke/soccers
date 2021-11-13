@@ -33,8 +33,10 @@ class MatchesScrapperDouble
 end
 
 RSpec.describe MatchesParser do
-  let(:ms)     { MatchesScrapperDouble.new }
-  let(:mp_initial)     { MatchesParser.new.call(ms.matches_initial) }
+  let(:ms)         { MatchesScrapperDouble.new }
+  let(:mp_initial) { MatchesParser.new(ms.matches_initial).call }
+  let(:mp_updated) { MatchesParser.new(ms.matches_updated).call }
+  let(:mp_new)     { MatchesParser.new(ms.matches_new).call }
 
   describe "#call" do
     describe "parse incoming data" do
@@ -48,27 +50,59 @@ RSpec.describe MatchesParser do
         end
 
         it "returns new teams ids" do
-          result = mp_initial
-          expect( result[:created_teams] ).to match_array(Team.all.ids)
+          expect( mp_initial[:created_teams] ).to match_array(Team.all.ids)
         end
 
         it "returns new matches ids" do
-          result = mp_initial
-          expect( result[:created_matches] ).to match_array(Match.all.ids)
+          expect( mp_initial[:created_matches] ).to match_array(Match.all.ids)
+        end
+
+        it "writing score in db" do
+          expect( Match.where(id: mp_initial[:created_matches]).all?{ |m| m.score_home.nil? && m.score_away.nil? } ).to be false
         end
       end
 
       context "when matches exist in db and its new score data comes" do
-        it "doesn't create matches"
-        it "updates matches score"
-        it "returns zero new matches count"
-        it "returns updated matches count"
+        before { 
+          mp_initial 
+          mp_updated
+        }
+
+        it "doesn't create matches" do
+          expect { mp_initial }.to change(Match, :count).by(0) 
+        end
+        
+        it "updates matches score" do
+          expect( Match.pluck(:score_home, :score_away).any? { nil } ).to be false
+        end
+
+        it "returns zero new matches ids" do
+          expect( mp_updated[:created_matches].count ).to eq(0)
+        end
+
+        it "returns updated matches ids" do
+          expect( mp_updated[:updated_matches].count ).to eq(2)
+        end
+
+        it "writing score in db" do
+          expect( Match.where(id: mp_initial[:created_matches]).any?{ |m| m.score_home.nil? && m.score_away.nil? } ).to be false
+        end
       end
       
       context "when some matches exist and some matches are new" do
-        it "doesn't create matches"
-        it "returns new matches count"
-        it "returns zero updated matches count"
+        before { mp_initial }
+
+        it "doesn't create matches" do
+          expect { mp_new }.to change(Match, :count).by(2)  
+        end
+
+        it "returns new matches ids" do
+          expect( mp_new[:created_matches].size ).to eq(2)
+        end
+
+        it "returns zero updated matches count" do
+          expect( mp_new[:updated_matches].size ).to eq(0)
+        end
       end
     end
   end
