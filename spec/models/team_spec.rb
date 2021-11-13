@@ -25,26 +25,5 @@ RSpec.describe Team, type: :model do
       # it { should belong_to(:country) }
       it { should have_many(:team_aliases) }
     end
-
-    describe 'instance methods' do
-      describe '#team_ids' do
-        let(:ms) { MatchesScrapperDouble.new }
-
-        context "when team exists" do
-
-        end
-        
-        context "when doesn't exist" do
-          subject { Team.team_ids({home_team: "Бешикташ", away_team: "Динамо Киев"}) }
-          it "creates teams" do
-            expect { subject }.to change(Team, :count).by(2)
-          end
-
-          it "returns ids" do
-            expect ( subject ).to eq( { home_team_id: Team.find_by_title("Бешикташ").id, away_team_id: Team.find_by_title("Динамо Киев").id } )
-          end
-        end
-      end
-    end
   end  
 end
