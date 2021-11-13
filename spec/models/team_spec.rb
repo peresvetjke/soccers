@@ -1,4 +1,11 @@
 require 'rails_helper'
+require 'pry'
+
+class MatchesScrapperDouble
+  def record(args)
+    { home_team: args["home_team"], away_team: args["away_team"] }
+  end
+end
 
 RSpec.describe Team, type: :model do
   describe 'validations' do
@@ -6,14 +13,11 @@ RSpec.describe Team, type: :model do
     # it { should validate_presence_of(:country)}
 
     describe 'uniqueness of title' do
-      let (:existing_team) { FactoryBot.create(:team, title: "#{Array.new(10) { ('a'..'z').to_a[rand(1..26)]}.join}" ) }
-      let (:existing_alias) { FactoryBot.create(:team_alias, title: "#{Array.new(10) { ('a'..'z').to_a[rand(1..26)]}.join}" )}
-      it "is not valid when same team title exists" do
-        expect { FactoryBot.create(:team, title: existing_team.title) }.to raise_error ActiveRecord::RecordInvalid, "Validation failed: Title has already been taken"
-      end
+      it { should validate_uniqueness_of(:title) }
 
       it "is not valid when same team_alias title exists" do
-        expect { FactoryBot.create(:team, title: existing_alias.title) }.to raise_error ActiveRecord::RecordInvalid, "Validation failed: Title already exists in of team aliases."
+        existing_alias = create(:team_alias, title: "Team" )
+        expect { create(:team, title: existing_alias.title) }.to raise_error ActiveRecord::RecordInvalid, "Validation failed: Title already exists in of team aliases."
       end
     end
 

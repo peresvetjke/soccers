@@ -60,6 +60,7 @@ group :test do
   gem 'webdrivers'
   gem 'rails-controller-testing'
   gem 'shoulda-matchers', '~> 5.0'
+  gem 'database_cleaner-active_record'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
