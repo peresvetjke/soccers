@@ -7,10 +7,42 @@ class MatchesScrapper
   SPORTS_RU_DATE_PATTERN  = /(?<day>\d{2})\.(?<month>\d{2})\.(?<year>\d{4})\|(?<hour>\d{2})\:(?<min>\d{2})/
   SPORTS_RU_SCORE_PATTERN = /(?<home_score>\d+)\s*\:\s*(?<away_score>\d+)/
 
-  def initialize
+  attr_reader :url, :logger
+
+  def initialize(url)
+    @url = url
+    @logger = Logger.new("#{Rails.root}/log/matches_scraper.log")
   end
 
   def call
+    html_doc = Nokogiri::HTML(URI.open(url))
+    match_infos = prepare(html_doc)
+    result = MatchesParser.new(match_infos).call
+    logger.info "------------------------------------------------------------------------
+    TOTAL: created_teams - #{result[:created_teams].count}; created_matches - #{result[:created_matches].count}; updated_matches - #{result[:updated_matches].count}
+    Details: #{result}"
+  end
+
+  def prepare(html_doc)
+    match_infos = []
+    
+    matches = html_doc.xpath("//tbody//tr")
+    matches.each do |m| 
+      date_time_raw = m.css('td')[0].text
+      dt = SPORTS_RU_DATE_PATTERN.match(date_time_raw)
+      date_time  = Time.new(dt[:year], dt[:month], dt[:day], dt[:hour], dt[:min])
+
+      home_team_raw = m.css('td')[1].text
+
+      away_team_raw = m.css('td')[3].text
+
+      score_raw = m.css('td')[2].text
+      score = SPORTS_RU_SCORE_PATTERN.match(score_raw)
+      score_home, score_away = score[:home_score].to_i, score[:away_score].to_i if score.present?
+      
+      match_infos << {date_time: date_time, home_team: home_team_raw, away_team: away_team_raw, score_home: score_home, score_away: score_away}
+    end
+    match_infos
   end
 end
 =begin
