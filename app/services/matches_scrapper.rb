@@ -7,6 +7,13 @@ class MatchesScrapper
   SPORTS_RU_DATE_PATTERN  = /(?<day>\d{2})\.(?<month>\d{2})\.(?<year>\d{4})\|(?<hour>\d{2})\:(?<min>\d{2})/
   SPORTS_RU_SCORE_PATTERN = /(?<home_score>\d+)\s*\:\s*(?<away_score>\d+)/
 
+  def initialize
+  end
+
+  def call
+  end
+end
+=begin
   attr_reader   :logger, :html_doc
   attr_accessor :count
 
@@ -81,6 +88,7 @@ class MatchesScrapper
       
       parsed_records << {date_time: date_time, home_team: home_team, away_team: away_team, score_home: score_home, score_away: score_away}
     end
+    logger.info parsed_records 
     parsed_records
   end
 
@@ -125,3 +133,4 @@ class MatchesScrapper
     [:score_home, :score_away]
   end
 end
+=end

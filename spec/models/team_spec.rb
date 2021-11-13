@@ -27,7 +27,7 @@ RSpec.describe Team, type: :model do
     end
 
     describe 'instance methods' do
-      describe '#accept!' do
+      describe '#team_ids' do
         let(:ms) { MatchesScrapperDouble.new }
 
         context "when team exists" do
