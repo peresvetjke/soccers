@@ -1,0 +1,11 @@
+h1 Index teams
+table
+  tr
+    th Title
+    th Place in rating
+    th Rating points
+  - teams.each do |team|
+    tr
+      td = team.title
+      td = team.rating
+      td = team.rating_points
