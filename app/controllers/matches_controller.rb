@@ -9,7 +9,7 @@ class MatchesController < ApplicationController
   private
 
   def find_matches
-    @matches = Match.all
+    @matches = Match.includes([:league, :home_team, :away_team]).all
     
     if params[:rating].present?
       @matches = @matches.top(params[:rating])
