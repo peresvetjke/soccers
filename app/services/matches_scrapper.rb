@@ -7,22 +7,30 @@ class MatchesScrapper
   SPORTS_RU_DATE_PATTERN  = /(?<day>\d{2})\.(?<month>\d{2})\.(?<year>\d{4})\|(?<hour>\d{2})\:(?<min>\d{2})/
   SPORTS_RU_SCORE_PATTERN = /(?<home_score>\d+)\s*\:\s*(?<away_score>\d+)/
 
-  attr_reader   :url, :logger
+  attr_reader   :league, :base_url, :logger, :month_from, :month_to
   attr_accessor :result, :errors
 
-  def initialize(url)
-    @url = url
+  def initialize(args)
+    raise ArgumentError if (args[:m_from].nil? || args[:m_to].nil? ) || (args[:m_from] > args[:m_to] || args[:m_from] < -3 || args[:m_to] > 6)
+    raise ArgumentError if args[:league].nil?
+
+    @league = args[:league]
+    @base_url = args[:base_url]
+    @month_from = args[:m_from] || defaults[:m_from]
+    @month_to = args[:m_to] || defaults[:m_to]
     @logger = Logger.new("#{Rails.root}/log/matches_scraper.log")
     @result = nil
     @errors = []
   end
 
   def call
-    logger.info "Starting scrapping url: #{self.url} ..."
-    html_doc = Nokogiri::HTML(URI.open(self.url))
-    match_infos = prepare(html_doc)
-    self.result = MatchesParser.new(match_infos).call
-    log_results
+    self.selected_urls.each do |url|
+      logger.info "Starting scrapping url: #{url} ..."
+      html_doc = Nokogiri::HTML(URI.open(url))
+      match_infos = prepare(html_doc)
+      self.result = MatchesParser.new(league: self.league, match_infos: match_infos).call
+      log_results
+    end
   end
 
   def prepare(html_doc)
@@ -59,5 +67,25 @@ class MatchesScrapper
     #{errors.each_with_index.map{|e, i| "Error #{i+1}" + e.first} }"
     end
     logger.info "------------------------------------------------------------------------"
+  end
+
+  def defaults
+    {
+      m_from: 0, # current
+      m_to: 2    # two next months
+    }
+  end
+
+  def selected_urls
+    html_doc = Nokogiri::HTML(URI.open(self.base_url))
+    month_urls = html_doc.css(".months").css('a')
+    actual_month = html_doc.css('.months a.act')[0]
+    selected = []
+
+    actual_month_order = month_urls.index(actual_month)
+    from, to = self.month_from + actual_month_order, self.month_to + actual_month_order
+    month_urls[from..to].each { |month_url| selected << month_url.attr('href') }
+
+    selected
   end
 end

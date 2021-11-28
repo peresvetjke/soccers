@@ -16,5 +16,6 @@ RSpec.describe Match, type: :model do
     # it { should have_many(:teams) }
     it { should belong_to(:home_team) }
     it { should belong_to(:away_team) }
+    it { should belong_to(:league) }
   end
 end

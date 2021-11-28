@@ -7,4 +7,8 @@ RSpec.describe Country, type: :model do
     it { should validate_uniqueness_of(:title) }
   end
 
+  describe "associations" do
+    it { should have_many(:teams) }
+
+  end
 end
