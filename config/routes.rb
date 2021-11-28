@@ -6,5 +6,8 @@ Rails.application.routes.draw do
 
   resources :matches, only: :index
 
-  resources :teams, only: :index
+  resources :teams, only: :index do
+    post    :add_to_favorites,      to: :add_to_favorites,      on: :member
+    delete  :remove_from_favorites, to: :remove_from_favorites, on: :member
+  end
 end
