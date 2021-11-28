@@ -4,6 +4,13 @@ class Match < ApplicationRecord
 
   validates :home_team, :away_team, :date_time, presence: true
 
+  default_scope { Match.order(date_time: :desc) }
+
+  def self.top(rating)
+    teams = Team.top(rating)
+    Match.where(home_team: teams, away_team: teams)
+  end
+
   def self.matches_by_team(team)
     Match.where(home_team: team).or(Match.where(away_team: team))
   end

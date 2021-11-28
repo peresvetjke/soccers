@@ -6,6 +6,8 @@ class Team < ApplicationRecord
   validates :title, uniqueness: true
   validate  :validate_title_uniqueness
 
+  scope :top, -> (rating) { where('rating <= ?', rating) }
+
   private
 
   def validate_title_uniqueness
