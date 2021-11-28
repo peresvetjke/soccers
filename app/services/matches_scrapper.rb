@@ -7,12 +7,14 @@ class MatchesScrapper
   SPORTS_RU_DATE_PATTERN  = /(?<day>\d{2})\.(?<month>\d{2})\.(?<year>\d{4})\|(?<hour>\d{2})\:(?<min>\d{2})/
   SPORTS_RU_SCORE_PATTERN = /(?<home_score>\d+)\s*\:\s*(?<away_score>\d+)/
 
-  attr_reader   :base_url, :logger, :month_from, :month_to
+  attr_reader   :league, :base_url, :logger, :month_from, :month_to
   attr_accessor :result, :errors
 
   def initialize(args)
     raise ArgumentError if (args[:m_from].nil? || args[:m_to].nil? ) || (args[:m_from] > args[:m_to] || args[:m_from] < -3 || args[:m_to] > 6)
+    raise ArgumentError if args[:league].nil?
 
+    @league = args[:league]
     @base_url = args[:base_url]
     @month_from = args[:m_from] || defaults[:m_from]
     @month_to = args[:m_to] || defaults[:m_to]
@@ -26,7 +28,7 @@ class MatchesScrapper
       logger.info "Starting scrapping url: #{url} ..."
       html_doc = Nokogiri::HTML(URI.open(url))
       match_infos = prepare(html_doc)
-      self.result = MatchesParser.new(match_infos).call
+      self.result = MatchesParser.new(league: self.league, match_infos: match_infos).call
       log_results
     end
   end

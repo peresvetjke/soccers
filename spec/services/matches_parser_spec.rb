@@ -3,40 +3,47 @@ require 'pry'
 
 class MatchesScrapperDouble
 
+  attr_reader :league_id
+
+  def initialize(league)
+    @league_id = league.id
+  end
+
   def matches_initial
     [
-      {:date_time=>Time.new(2021,11,02,20,45), :home_team=> "Вольфсбург", :away_team=> "Ред Булл", :score_home=>2, :score_away=>1}, 
-      {:date_time=>Time.new(2021,11,24,23,00), :home_team=> "Атлетико", :away_team=> "Милан", :score_home=>nil, :score_away=>nil}, 
-      {:date_time=>Time.new(2021,11,24,23,00), :home_team=> "Ливерпуль", :away_team=> "Порту", :score_home=>nil, :score_away=>nil}
+      {:date_time=>Time.new(2021,11,02,20,45), :home_team=> "Вольфсбург", :away_team=> "Ред Булл", :score_home=>2, :score_away=>1, :league_id=>league_id}, 
+      {:date_time=>Time.new(2021,11,24,23,00), :home_team=> "Атлетико", :away_team=> "Милан", :score_home=>nil, :score_away=>nil, :league_id=>league_id}, 
+      {:date_time=>Time.new(2021,11,24,23,00), :home_team=> "Ливерпуль", :away_team=> "Порту", :score_home=>nil, :score_away=>nil, :league_id=>league_id}
     ]
   end
 
   def matches_updated
     [
-      {:date_time=>Time.new(2021,11,02,20,45), :home_team=> "Вольфсбург", :away_team=> "Ред Булл", :score_home=>2, :score_away=>1}, 
+      {:date_time=>Time.new(2021,11,02,20,45), :home_team=> "Вольфсбург", :away_team=> "Ред Булл", :score_home=>2, :score_away=>1, :league_id=>league_id}, 
       # score updated in two lines up to initial:
-      {:date_time=>Time.new(2021,11,24,23,00), :home_team=> "Атлетико", :away_team=> "Милан", :score_home=>2, :score_away=>3}, 
-      {:date_time=>Time.new(2021,11,24,23,00), :home_team=> "Ливерпуль", :away_team=> "Порту", :score_home=>3, :score_away=>4}
+      {:date_time=>Time.new(2021,11,24,23,00), :home_team=> "Атлетико", :away_team=> "Милан", :score_home=>2, :score_away=>3, :league_id=>league_id}, 
+      {:date_time=>Time.new(2021,11,24,23,00), :home_team=> "Ливерпуль", :away_team=> "Порту", :score_home=>3, :score_away=>4, :league_id=>league_id}
     ]
   end
 
   def matches_new
     [
-      {:date_time=>Time.new(2021,11,02,20,45), :home_team=> "Вольфсбург", :away_team=> "Ред Булл", :score_home=>2, :score_away=>1}, 
-      {:date_time=>Time.new(2021,11,24,23,00), :home_team=> "Атлетико", :away_team=> "Милан", :score_home=>nil, :score_away=>nil}, 
-      {:date_time=>Time.new(2021,11,24,23,00), :home_team=> "Ливерпуль", :away_team=> "Порту", :score_home=>nil, :score_away=>nil},
+      {:date_time=>Time.new(2021,11,02,20,45), :home_team=> "Вольфсбург", :away_team=> "Ред Булл", :score_home=>2, :score_away=>1, :league_id=>league_id}, 
+      {:date_time=>Time.new(2021,11,24,23,00), :home_team=> "Атлетико", :away_team=> "Милан", :score_home=>nil, :score_away=>nil, :league_id=>league_id}, 
+      {:date_time=>Time.new(2021,11,24,23,00), :home_team=> "Ливерпуль", :away_team=> "Порту", :score_home=>nil, :score_away=>nil, :league_id=>league_id},
       # two new lines up to initial:
-      {:date_time=>Time.new(2021,11,02,20,45), :home_team=> "Мальме", :away_team=> "Челси", :score_home=>0, :score_away=>1}, 
-      {:date_time=>Time.new(2021,11,02,23,00), :home_team=> "Динамо Киев", :away_team=> "Барселона", :score_home=>nil, :score_away=>nil},
+      {:date_time=>Time.new(2021,11,02,20,45), :home_team=> "Мальме", :away_team=> "Челси", :score_home=>0, :score_away=>1, :league_id=>league_id}, 
+      {:date_time=>Time.new(2021,11,02,23,00), :home_team=> "Динамо Киев", :away_team=> "Барселона", :score_home=>nil, :score_away=>nil, :league_id=>league_id},
     ]
   end
 end
 
 RSpec.describe MatchesParser do
-  let(:ms)         { MatchesScrapperDouble.new }
-  let(:mp_initial) { MatchesParser.new(ms.matches_initial).call }
-  let(:mp_updated) { MatchesParser.new(ms.matches_updated).call }
-  let(:mp_new)     { MatchesParser.new(ms.matches_new).call }
+  let(:league)     { create(:league, country: nil) }
+  let(:ms)         { MatchesScrapperDouble.new(league) }
+  let(:mp_initial) { MatchesParser.new(league: league, match_infos: ms.matches_initial).call }
+  let(:mp_updated) { MatchesParser.new(league: league, match_infos: ms.matches_updated).call }
+  let(:mp_new)     { MatchesParser.new(league: league, match_infos: ms.matches_new).call }
 
   describe "#call" do
     context "when database is blank and matches data comes" do

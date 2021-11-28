@@ -1,12 +1,14 @@
 h1 Index matches
 table
   tr
+    th League
     th Date-time
     th Home team
     th Score
     th Away team
   - @matches.each do |match|
     tr
+      td = match.league.title
       td = match.date_time.strftime("%Y-%m-%d %H:%M")
       td = match.home_team.title
       td = "#{match.score_home} : #{match.score_away}"

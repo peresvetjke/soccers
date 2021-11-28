@@ -28,7 +28,7 @@ la_liga    = League.create!(title: "La Liga", url: "https://www.sports.ru/la-lig
 bundesliga = League.create!(title: "Bundesliga", url: "https://www.sports.ru/bundesliga/calendar/")  
 seria_a    = League.create!(title: "Seria A", url: "https://www.sports.ru/seria-a/calendar/")  
 ligue_1    = League.create!(title: "Ligue 1", url: "https://www.sports.ru/ligue-1/calendar/")  
-# ucl     = League.create!(title: "UCL", url: "https://www.sports.ru/ucl/calendar/")
+ucl        = League.create!(title: "UCL", url: "https://www.sports.ru/ucl/calendar/")
 League.all.each { |league| league.scrap_schedule! }
 
 # Collect ratings

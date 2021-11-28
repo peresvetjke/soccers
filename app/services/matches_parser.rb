@@ -4,11 +4,13 @@ require 'pry'
 
 class MatchesParser
 
-  attr_reader   :match_infos
+  attr_reader   :match_infos, :league
   attr_accessor :result
 
-  def initialize(match_infos)
-    @match_infos = match_infos
+  def initialize(args)
+    # binding.pry
+    @league = args[:league]
+    @match_infos = args[:match_infos]
     @result = { created_teams: [], created_matches: [], updated_matches: [] }
   end
 
@@ -19,6 +21,7 @@ class MatchesParser
       away_team  = Team.find_or_initialize_by(title: match_info[:away_team])
       score_home = match_info[:score_home]
       score_away = match_info[:score_away]
+      league     = match_info[:league]
 
       [home_team, away_team].each do |team| 
         if team.new_record?
@@ -27,7 +30,7 @@ class MatchesParser
         end
       end
 
-      match = Match.find_or_initialize_by(home_team_id: home_team.id, away_team_id: away_team.id, date_time: date_time)
+      match = Match.find_or_initialize_by(home_team_id: home_team.id, away_team_id: away_team.id, date_time: date_time, league_id: self.league.id)
       match.assign_attributes(score_home: score_home, score_away: score_away)
       if match.new_record?
         match.save!
