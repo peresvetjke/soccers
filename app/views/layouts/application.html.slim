@@ -8,6 +8,10 @@ html
     
       = stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload'
       = javascript_pack_tag 'application', 'data-turbolinks-track': 'reload'
-  body
+      = stylesheet_link_tag 'application', 'https://fonts.googleapis.com/css?family=Oswald|Noto+Sans'
+
+  body.page  
+    = render 'shared/nav'
+    .container-md
       = render 'shared/flash'
-      = yield
+      .block.shadow-lg = yield

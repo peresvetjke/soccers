@@ -1,5 +1,19 @@
-h1 Index matches
-table
+h1 Matches
+h3 Search
+
+= form_with model: @match, url: matches_path, method: :get, local: true do |f|
+  = f.label :rating, "Top X rating of teams"
+  br
+  = f.number_field :rating
+  br
+  = f.collection_check_boxes :league_id, League.order(:title), :id, :title, include_hidden: false
+  br
+  = f.label :include_favorites, "Include your favorite teams?"
+  = f.check_box :include_favorites, include_hidden: false
+  br
+  = f.button "Search"
+
+table.table.bordered
   tr
     th League
     th Date-time

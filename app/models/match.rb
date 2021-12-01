@@ -15,4 +15,9 @@ class Match < ApplicationRecord
   def self.matches_by_team(team)
     Match.where(home_team: team).or(Match.where(away_team: team))
   end
+
+  def self.matches_of_favorites_by_user(user)
+    teams = Team.where(id: user.favorite_teams.ids)
+    self.matches_by_team(teams)
+  end
 end
