@@ -1,0 +1,36 @@
+var matches = '<%= render @matches %>'
+$(".matches tbody tr").remove()
+$(".matches tbody").append(matches)
+
+// Listeners
+var track_links   = document.querySelectorAll('.matches .track a')
+var untrack_links = document.querySelectorAll('.matches .untrack a')
+
+if (track_links.length) {
+  for (var i = 0; i < track_links.length; i++) {
+    track_links[i].addEventListener('click', trackButtonHandler);  
+  }
+}
+
+if (untrack_links.length) {
+  for (var i = 0; i < untrack_links.length; i++) {
+    untrack_links[i].addEventListener('click', trackButtonHandler);  
+  }
+}
+
+function trackButtonHandler(event) {
+  var matchId = this.dataset.itemId;
+  trackFormHandler(matchId)
+}
+
+function trackFormHandler(matchId) {
+  var trackButton = document.body.querySelector(`tr[item-id="${matchId}"] .track`)
+  var untrackButton = document.body.querySelector(`tr[item-id="${matchId}"] .untrack`)
+  if (trackButton.classList.contains('hide')) {
+    trackButton.classList.remove('hide');
+    untrackButton.classList.add('hide');
+  } else {
+    trackButton.classList.add('hide');
+    untrackButton.classList.remove('hide');
+  }
+}
