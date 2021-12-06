@@ -20,4 +20,10 @@ class Match < ApplicationRecord
     teams = Team.where(id: user.favorite_teams.ids)
     self.matches_by_team(teams)
   end
+
+  def self.with_titles(matches)
+    matches.map do |match|
+      { league_title: match.league.title, date_time: match.date_time.strftime("%Y-%m-%d %H:%M"), home_team_title: match.home_team.title, away_team_title: match.away_team.title, score_home: match.score_home, score_away: match.score_away }
+    end
+  end
 end

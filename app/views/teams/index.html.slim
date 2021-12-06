@@ -5,13 +5,4 @@ table.table
     th Place in rating
     th Rating points
     th Actions
-  - @teams.each do |team|
-    tr
-      td = team.title
-      td = team.rating
-      td = team.rating_points
-      td 
-        - if team.favorite?(current_user)
-          = button_to "Remove from favorites", remove_from_favorites_team_path(team), method: :delete, data: { confirm: "Are you sure?" }
-        - else
-          = button_to "Add to favorites", add_to_favorites_team_path(team)
+  = render @teams

@@ -3,7 +3,10 @@ class MatchesController < ApplicationController
   before_action :find_matches, only: :index
 
   def index
-
+    respond_to do |format|
+      format.html
+      format.json { render json: Match.with_titles(@matches) }
+    end
   end
 
   private
