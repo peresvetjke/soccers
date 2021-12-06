@@ -10,7 +10,7 @@ class Match < ApplicationRecord
   scope :tracked_by_user, -> (user) { joins(:tracked_matches).where('tracked_matches.user_id = ?', user.id) }
 
   def add_to_tracked(user)
-    TrackedMatch.create(match: self, user: user)
+    TrackedMatch.create!(match: self, user: user)
   end
 
   def tracked?(user)

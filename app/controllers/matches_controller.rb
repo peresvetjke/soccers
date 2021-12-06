@@ -1,7 +1,7 @@
 class MatchesController < ApplicationController
   before_action :authenticate_user!, only: %i[add_to_tracked remove_from_tracked]  
   before_action :find_matches, only: :index
-  before_action :find_tracked, only: :index
+  before_action :find_tracked, only: :index, if: -> { current_user.present? }
   before_action :find_match,   only: %i[add_to_tracked remove_from_tracked]
 
   def index
