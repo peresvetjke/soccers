@@ -10,3 +10,7 @@ development:
 test:
   <<: *default
   database: soccers_test
+
+production:
+  <<: *default
+  database: soccers_production
