@@ -1,6 +1,12 @@
-tr
+tr *{'item-id': match.id}
   td = match.league.title
   td = match.date_time.strftime("%Y-%m-%d %H:%M")
   td = match.home_team.title
   td = "#{match.score_home} : #{match.score_away}"
   td = match.away_team.title
+  td 
+    -if current_user.present?
+      div class=(@tracked_ids.include?(match.id) ? "untrack" : "untrack hide") 
+        = link_to "Untrack", remove_from_tracked_match_path(match), remote: true, method: :delete, format: :json, data: {'item-id': match.id}
+      div class=(@tracked_ids.include?(match.id) ? "track hide" : "track") 
+        = link_to "Track", add_to_tracked_match_path(match), remote: true, method: :post, format: :json, data: {'item-id': match.id}

@@ -4,7 +4,11 @@ Rails.application.routes.draw do
   
   root to: "matches#index"
 
-  resources :matches, only: :index
+  resources :matches, only: :index do
+    get :tracked, on: :collection
+    post   :add_to_tracked,       on: :member
+    delete :remove_from_tracked,  on: :member
+  end
 
   resources :teams, only: :index do
     post    :add_to_favorites,      to: :add_to_favorites,      on: :member

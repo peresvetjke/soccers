@@ -1,7 +1,7 @@
 h1 Matches
 h3 Search
 
-.search_matches = form_with(model: @match, url: matches_path, method: :get, local: false, data: {type: :json}) do |f|
+.search_matches = form_with(model: @match, url: matches_path, method: :get, local: false, data: {format: :js}) do |f|
   = f.collection_check_boxes :league_id, League.order(:title), :id, :title, include_hidden: false
   br
   = f.label :rating, "Top X rating of teams"
@@ -20,5 +20,6 @@ table.table.bordered.matches
       th Home team
       th Score
       th Away team
+      th Actions
   tbody
     = render @matches

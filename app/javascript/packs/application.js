@@ -6,6 +6,7 @@
 //= require popper
 //= require bootstrap-sprockets
 //= require underscore
+//= require_tree .
 
 import Rails from "@rails/ujs"
 import Turbolinks from "turbolinks"

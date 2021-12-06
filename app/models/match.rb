@@ -2,10 +2,24 @@ class Match < ApplicationRecord
   belongs_to :home_team, class_name: "Team", foreign_key: "home_team_id"
   belongs_to :away_team, class_name: "Team", foreign_key: "away_team_id" 
   belongs_to :league
+  has_many   :tracked_matches
   
   validates :home_team, :away_team, :date_time, presence: true
 
   default_scope { Match.order(date_time: :desc) }
+  scope :tracked_by_user, -> (user) { joins(:tracked_matches).where('tracked_matches.user_id = ?', user.id) }
+
+  def add_to_tracked(user)
+    TrackedMatch.create!(match: self, user: user)
+  end
+
+  def tracked?(user)
+    TrackedMatch.find_by(match:self, user: user).present?
+  end
+
+  def remove_from_tracked(user)
+    TrackedMatch.find_by(match: self, user: user).destroy
+  end
 
   def self.top(rating)
     teams = Team.top(rating)
