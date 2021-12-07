@@ -1,24 +1,12 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Love soccer?
+This simple app helps you to keep an eye on top-rated soccer teams.
 
-Things you may want to cover:
+App:
+https://peresvetjke-soccers.herokuapp.com/
+- match schedules are being scrapped from Sports.ru (every 03:00 AM UTC);
+- teams rating - Transfermarkt.ru;
+- once logged in, you will be able to track specific match and build your personal calendar AND extend it mark your favorite teams.
 
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+Have fun!
